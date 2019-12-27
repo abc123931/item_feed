@@ -6,7 +6,8 @@ async function init() {
     keyword: "スプラトゥーン",
     count: 1
   });
-  await getRssFeed("http://rssblog.ameba.jp/bomme5792l/rss20.xml");
+  // await getRssFeed("http://rssblog.ameba.jp/bomme5792l/rss20.xml");
+  await getRssFeed("http://blog.livedoor.jp/monstsubdiary/index.rdf");
 }
 
 init();

@@ -1,4 +1,6 @@
-import Parser from 'rss-parser';
+import Parser from "rss-parser";
+import libxmljs from "libxmljs";
+import R from "ramda";
 
 const parser = new Parser();
 
@@ -10,16 +12,26 @@ async function getRssFeed(url: string) {
   //   return;
   // });
   const item = feed.items?.find(item => item);
-  console.log(item?.link)
-  console.log(item?.content)
-  const test = item?.content?.match("<img.*src\s*=\s*[\"|\'](.*?)[\"|\'].*>");
-  console.log(test);
-  console.log(test![0]);
-// var regex = /<img.*?src\s*=\s*[\"|\'](.*?)[\"|\'].*?>/g;
-// var found = paragraph.match(regex);
-// var urls = found.flatMap(i => i.match(/http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=]*)?/g))
-
-// console.log(urls);
+  console.log(item?.link);
+  // livedoorはcontent:encodedに入っている説
+  // amebloはcontentに入っている
+  const livedoorContent = item!['content:encoded'];
+  const documentImg = libxmljs.parseHtmlString(livedoorContent);
+  // gifは取り除きたい
+  const images = documentImg.find("//img").filter(
+    e =>
+      e
+        .attr("src")
+        ?.value()
+        .search(/.*gif$/) === -1
+  ).map(e => e.attr("src")?.value());
+  console.log(R.uniq(images));
+  console.log(
+    documentImg
+      .get("//img")
+      ?.attr("src")
+      ?.value()
+  );
 }
 
 export default getRssFeed;
